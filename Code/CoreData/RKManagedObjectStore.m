@@ -255,26 +255,8 @@ static char RKManagedObjectContextChangeMergingObserverAssociationKey;
                      NSMigratePersistentStoresAutomaticallyOption: @(YES),
                      NSInferMappingModelAutomaticallyOption: @(YES) };
     }
-    
-    /** 
-     There seems to be trouble with combining configurations and migration. So do this in two steps: first, attach the store with NO configuration, but WITH migration options; then remove it and reattach WITH configuration, but NOT migration options.
-     
-     http://blog.atwam.com/blog/2012/05/11/multiple-persistent-stores-and-seed-data-with-core-data/
-     http://stackoverflow.com/questions/1774359/core-data-migration-error-message-model-does-not-contain-configuration-xyz
-     */    
-    NSPersistentStore *persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:error];
-    if (! persistentStore) return nil;
-    if (! [self.persistentStoreCoordinator removePersistentStore:persistentStore error:error]) return nil;
 
-    NSDictionary *seedOptions = nil;
-    if (nilOrOptions) {
-        NSMutableDictionary *mutableOptions = [nilOrOptions mutableCopy];
-        mutableOptions[RKSQLitePersistentStoreSeedDatabasePathOption] = (seedPath ?: [NSNull null]);
-        seedOptions = mutableOptions;
-    } else {
-        seedOptions = @{ RKSQLitePersistentStoreSeedDatabasePathOption: (seedPath ?: [NSNull null]) };
-    }
-    persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nilOrConfigurationName URL:storeURL options:seedOptions error:error];
+    NSPersistentStore *persistentStore = [self.persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nilOrConfigurationName URL:storeURL options:options error:error];
     if (! persistentStore) return nil;
     
     // Exclude the SQLite database from iCloud Backups to conform to the iCloud Data Storage Guidelines
